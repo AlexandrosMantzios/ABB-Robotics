@@ -1,0 +1,79 @@
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe.config
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\ABB.Robotics.Controllers.PC.dll
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\RobotStudio.Services.RobApi.Desktop.dll
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\RobotStudio.Services.RobApi.dll
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\ABB.Robotics.Controllers.PC.xml
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form1.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Properties.Resources.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.GenerateResource.cache
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CoreCompileInputs.cache
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CopyComplete
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.exe
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl1.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl2.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl3.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form2.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form3.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form4.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form5.resources
+C:\Users\alexandrosm\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csprojAssemblyReference.cache
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe.config
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\ABB.Robotics.Controllers.PC.xml
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csprojAssemblyReference.cache
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form1.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form2.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form3.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form4.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form5.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Properties.Resources.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl1.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl2.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl3.resources
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.GenerateResource.cache
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CoreCompileInputs.cache
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CopyComplete
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.exe
+D:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe.config
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\bin\Debug\ABB.Robotics.Controllers.PC.xml
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csprojAssemblyReference.cache
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form1.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form2.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form3.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form4.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form5.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Properties.Resources.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl1.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl2.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl3.resources
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.GenerateResource.cache
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CoreCompileInputs.cache
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CopyComplete
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.exe
+F:\AS HELLAS\Visual_Studio C#\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe.config
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.exe
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\Robot_PC_Interface_Panel_Template_New.pdb
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\bin\Debug\ABB.Robotics.Controllers.PC.xml
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csprojAssemblyReference.cache
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form1.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form2.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form3.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form4.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Form5.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.Properties.Resources.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl1.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl2.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.UserControl3.resources
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.GenerateResource.cache
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CoreCompileInputs.cache
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.csproj.CopyComplete
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.exe
+C:\Users\a.mantzios\source\repos\Robot_PC_Interface_Panel_Template_New\obj\Debug\Robot_PC_Interface_Panel_Template_New.pdb
