@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -44,7 +44,7 @@ namespace Robot_PC_Interface_Panel_Template_New
 
 
         public Form1()
-        {
+        {   // Initialize screen 
             InitializeComponent();
             form1 = this;
            
@@ -59,22 +59,11 @@ namespace Robot_PC_Interface_Panel_Template_New
 
         public void Form1_Load(object sender, EventArgs e)
         {
-
-            //userControl11.Hide();
-            // userControl11.controller1 = this.controller;
-           // userControl11.controller1 = this.controller;
-            //userControl21.Hide();
-         
-            //userControl31.Hide();
-
             this.scanner = new NetworkScanner();
             this.scanner.Scan();
             ControllerInfoCollection controllers = scanner.Controllers;
             ListViewItem item = null;
             foreach (ControllerInfo controllerInfo in controllers)
-
-
-
             {
                 item = new ListViewItem(controllerInfo.IPAddress.ToString());
                 item.SubItems.Add(controllerInfo.Id);
@@ -86,31 +75,20 @@ namespace Robot_PC_Interface_Panel_Template_New
                 this.listView1.Items.Add(item);
                 item.Tag = controllerInfo;
             }
-
-
-
             this.networkwatcher = new NetworkWatcher(scanner.Controllers);
             this.networkwatcher.Found += new EventHandler<NetworkWatcherEventArgs>(HandleFoundEvent);
             this.networkwatcher.Lost += new EventHandler<NetworkWatcherEventArgs>(HandleLostEvent);
             this.networkwatcher.EnableRaisingEvents = true;
-
-
-
         }
         public void HandleLostEvent(object sender, NetworkWatcherEventArgs e)
         {
-            // throw new NotImplementedException();
-            // EventHandler<NetworkWatcherEventArgs> AddControllerToListView = null;
             this.Invoke(new EventHandler<NetworkWatcherEventArgs>(RemoveControllerFromListView), new Object[] { sender, e });
         }
 
         public void HandleFoundEvent(object sender, NetworkWatcherEventArgs e)
 
         {
-           // EventHandler<NetworkWatcherEventArgs> AddControllerToListView = null;
             this.Invoke(new EventHandler<NetworkWatcherEventArgs>(AddControllerToListView), new object[] { this, e });
-            
-
         }
 
         private void RemoveControllerFromListView(object sender, NetworkWatcherEventArgs e)
@@ -139,15 +117,7 @@ namespace Robot_PC_Interface_Panel_Template_New
             item.Tag = controllerInfo;
         }
 
-
-
-
-     
-
-
         // SELECT CONTROLLER AND SHOW SIGNALS
-
-
         public void ListView1_DoubleClick(object sender, EventArgs e)
         {
             ListViewItem item = this.listView1.SelectedItems[0];
@@ -155,19 +125,7 @@ namespace Robot_PC_Interface_Panel_Template_New
             {
                 ControllerInfo controllerInfo = (ControllerInfo)item.Tag;
                 if (controllerInfo.Availability == ABB.Robotics.Controllers.Availability.Available)
-                {
-                  //  button1.Enabled = false;
-                  //  button2.Enabled = false;
-                  //  button3.Enabled = false;
-                  //  button4.Enabled = false;
-                  //  button5.Enabled = false;
-                   // button6.Enabled = false;
-                  //  button7.Enabled = false;
-                   // button8.Enabled = false;
-                   // button9.Enabled = false;
-                  //  button10.Enabled = false;
-
-                    
+                {                    
                     if (controller != null)
                     {
                         this.controller.Logoff();
@@ -178,13 +136,10 @@ namespace Robot_PC_Interface_Panel_Template_New
 
                     MessageBox.Show("Is Available");
                     this.controller.Logon(UserInfo.DefaultUser);
-
                 }
                 else
                 {
                     MessageBox.Show("Selected controller not available");
-
-
                 }
             }
             ListViewItem item1 = null;
@@ -194,6 +149,7 @@ namespace Robot_PC_Interface_Panel_Template_New
 
                 IOFilterTypes mSigFilter = IOFilterTypes.Digital | IOFilterTypes.Output;
                 SignalCollection signals_o = this.controller.IOSystem.GetSignals(mSigFilter);
+
                 foreach (Signal Signal1 in signals)
                 {
                     item1 = new ListViewItem(Signal1.Name);
@@ -201,8 +157,6 @@ namespace Robot_PC_Interface_Panel_Template_New
                     item1.SubItems.Add(Signal1.Value.ToString());
                   //  this.listView2.Items.Add(item1);
                     item1.Tag = Signal1;
-
-
                 }
 
                 foreach (Signal Signal1 in signals_o)
@@ -216,94 +170,49 @@ namespace Robot_PC_Interface_Panel_Template_New
 
             }
 
-            {
-           
-             
-
-            }
-
-
-
-            {
-
-            }
-
-            {
-
-            }
+          
 
             {
                 Signal sig7 = controller.IOSystem.GetSignal("PalletSensor");
                 DigitalSignal digitalSig = (DigitalSignal)sig7; int val1 = digitalSig.Get();
-                //   this.textBox2.Text = val1.ToString();
                 sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
-
             }
 
-            {
-               // userControl11.controller = this.controller;
-             //   userControl21.controller = this.controller;
-              //  userControl31.controller = this.controller;
-            }
+
 
             {
 
                 Signal sig8 = controller.IOSystem.GetSignal("Air_On");
                 DigitalSignal digitalSig = (DigitalSignal)sig8; int val2 = digitalSig.Get();
-                // this.textBox7.Text = val2.ToString();
                 sig8.Changed += new EventHandler<SignalChangedEventArgs>(sig8_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
-
             }
 
 
             {
                 Signal sig9 = controller.IOSystem.GetSignal("PLC_Comms");
                 DigitalSignal digitalSig = (DigitalSignal)sig9; int val3 = digitalSig.Get();
-                // this.textBox3.Text = val3.ToString();
                 sig9.Changed += new EventHandler<SignalChangedEventArgs>(sig9_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
-
             }
 
 
             {
                 Signal sig10 = controller.IOSystem.GetSignal("ProductinPlace");
                 DigitalSignal digitalSig = (DigitalSignal)sig10; int val4 = digitalSig.Get();
-              //  this.textBox4.Text = val4.ToString();
                 sig10.Changed += new EventHandler<SignalChangedEventArgs>(sig10_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
 
             }
 
             {
                 Signal sig11 = controller.IOSystem.GetSignal("Attach2");
                 DigitalSignal digitalSig = (DigitalSignal)sig11; int val5 = digitalSig.Get();
-               // this.textBox5.Text = val5.ToString();
                 sig11.Changed += new EventHandler<SignalChangedEventArgs>(sig11_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
-
             }
 
             {
                 Signal sig12 = controller.IOSystem.GetSignal("Motors_ON");
                 DigitalSignal digitalSig = (DigitalSignal)sig12; int val6 = digitalSig.Get();
-              //  this.textBox6.Text = val6.ToString();
                 sig12.Changed += new EventHandler<SignalChangedEventArgs>(sig12_Changed);
-                //  if (val == 1) { this.checkBox5.Checked = true; }
-                // if (val == 0) { this.checkBox5.Checked = false; }
-                //  sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
+ 
 
             }
 
@@ -311,44 +220,20 @@ namespace Robot_PC_Interface_Panel_Template_New
 
         }
 
-
-
-
-
-
-
-
-
         public void sig7_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
-
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListValueControllers), new object[] { this, e });
-
         }
 
         public void sig8_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
-
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI1), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue1), new object[] { this, e });
-
         }
 
         public void sig9_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
 
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI2), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue2), new object[] { this, e });
@@ -357,103 +242,40 @@ namespace Robot_PC_Interface_Panel_Template_New
 
         public void sig10_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
-
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI3), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue3), new object[] { this, e });
-
         }
 
         public void sig11_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
-
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI4), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue4), new object[] { this, e });
-
         }
 
         public void sig12_Changed(object sender, SignalChangedEventArgs e)
         {
-            // SignalState sig4 = e.NewSignalState;
-            // float val = sig4.Value;
-            //  if (val == 1) { this.checkBox2.Checked = true; }
-            //   if (val == 0) { this.checkBox2.Checked = false; }
-
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI5), new object[] { this, e });
             this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue5), new object[] { this, e });
-
         }
-
-
-        //private void sig7_Changed(object sender, SignalChangedEventArgs e)
-        //{
-        //    SignalState sig7 = e.NewSignalState;
-        //    float val = sig7.Value;
-        //    if (val == 1) { this.checkBox2.Checked = true; }
-        //    if (val == 0) { this.checkBox2.Checked = false; }
-        //}
-
-        //  void HandleFoundEvent(object sender, NetworkWatcherEventArgs e)
-
-        //  {
-        //      EventHandler<NetworkWatcherEventArgs> AddControllerToListView = null;
-        //      this.Invoke(new EventHandler<NetworkWatcherEventArgs>(AddControllerToListView), new object[] { this, e });
-
-        //  }
-
-
-
-
-        //  private void sig7_Changed (object sender, SignalChangedEventArgs e)
-        //  {
-        //  this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateUI), new object[] { this, e });
-        //  this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue), new object[] { this, e });
-        //  }
-
-
-
-        //private void Signal1_Changed(object sender, SignalChangedEventArgs e)
-        //{
-        //    this.Invoke(new EventHandler<SignalChangedEventArgs>(UpdateListViewValue), new object[] { this, e });
-
-        //}
 
         public void UpdateUI(object sender, SignalChangedEventArgs e)
         {
-
             SignalState sig7 = e.NewSignalState;
-            float val1 = sig7.Value;
-            {
-              //  this.textBox2.Text = val1.ToString();
-
-            }
+            float val1 = sig7.Value;   
         }
 
         public void UpdateUI1(object sender, SignalChangedEventArgs e)
         {
             SignalState sig8 = e.NewSignalState;
-            float val2 = sig8.Value;
-            {
-              //  this.textBox7.Text = val2.ToString();
-
-            }
+            float val2 = sig8.Value;  
         }
 
         public void UpdateUI2(object sender, SignalChangedEventArgs e)
         {
             SignalState sig9 = e.NewSignalState;
             float val3 = sig9.Value;
-            {
-             //   this.textBox3.Text = val3.ToString();
-
-            }
+            
+            
         }
 
 
@@ -461,10 +283,7 @@ namespace Robot_PC_Interface_Panel_Template_New
         {
             SignalState sig10 = e.NewSignalState;
             float val4 = sig10.Value;
-            {
-              //  this.textBox4.Text = val4.ToString();
 
-            }
         }
 
 
@@ -472,20 +291,12 @@ namespace Robot_PC_Interface_Panel_Template_New
         {
             SignalState sig11 = e.NewSignalState;
             float val5 = sig11.Value;
-            {
-              //  this.textBox5.Text = val5.ToString();
-
-            }
         }
 
         public void UpdateUI5(object sender, SignalChangedEventArgs e)
         {
             SignalState sig12 = e.NewSignalState;
             float val6 = sig12.Value;
-            {
-             //   this.textBox6.Text = val6.ToString();
-
-            }
         }
 
 
@@ -984,50 +795,7 @@ namespace Robot_PC_Interface_Panel_Template_New
         }
 
 
-
-
-
-
-
-
-
-
-
-        //private void Button6_MouseClick(object sender, MouseEventArgs e)
-        //{
-        //    try
-        //    {
-        //        if (controller.OperatingMode == ControllerOperatingMode.Auto)
-        //        {
-        //            using (Mastership m = Mastership.Request(controller.Rapid))
-        //            {
-
-        //                RapidData rd = controller.Rapid.GetRapidData("T_ROB1", "Module1", "NumberOfPallets");
-        //                Num ChangedValue = new Num();
-        //                string str = textBox1.Text;
-        //                ChangedValue.FillFromString2(str);
-        //                {
-        //                    rd.Value = ChangedValue;
-        //                }
-        //                // ABB.Robotics.Controllers.RapidDomain.String rapidString;
-        //                // rapidString.FillFromString(textBox1.Text);       
-        //                // rd.Value = rapidString;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show("Automatic mode is required.");
-        //        }
-        //    }
-        //    catch (System.InvalidOperationException ex)
-        //    {
-        //        MessageBox.Show("Mastership is held by another client. " + ex.Message);
-        //    }
-        //    catch (System.Exception ex)
-        //    {
-        //        MessageBox.Show("Unexpected error occurred: " + ex.Message);
-        //    }
-        //}
+    }
     }
 
 
