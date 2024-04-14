@@ -8,7 +8,7 @@ MODULE Module1
     !
     ! Author: a.mantzios (AS HELLAS)
     !
-    ! Version: 1.0
+    ! Version: 1.2
     !
 
           
@@ -202,7 +202,7 @@ CONST robtarget Pick_Pallet_Approach:=[[964.785,1550.630055397,323.82997053],[0,
     CONST robtarget Homing_Right_Approach:=[[860.898,1534.847055397,323.82997053],[0,-0.707106781,0.707106781,0],[1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
    VAR string servicestring;
     CONST robtarget Homing_Left_Approach:=[[947.357,-1516.470944603,638.82997053],[0,0.707106781,0.707106781,0],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-! ###########################################################################################################################################################################################################
+! ###################################################################################################################################################################################################
      
     
     ! SYSTEM INPUT SIGNALS
@@ -216,7 +216,684 @@ CONST robtarget Pick_Pallet_Approach:=[[964.785,1550.630055397,323.82997053],[0,
     !  "POWER FAIL ERROR"
     !  "PRODUCTION EXECUTION ERROR"
 
-! #######################################################################################################################################################
+!######################################################################################
+! CHECK AIR PRESSURE SYSTEM ----> SIGNAL TO BE SUPPLIED BY PLC USING ANALOGUE MEASUREMENTS OR A SIMPLE DI / DO      
+PROC CheckAir()
+    WHILE Air_On=0 DO
+        Set Air_Fault;
+        Set Sequence_Fault;
+        TPWrite "Air Supply Problem";
+        TPWrite "Check Compressed Air Supply";
+        TPWrite "Wait for Fault Rectification";
+        WaitDI Air_On,1; 
+        Reset Air_Fault;
+        Reset Sequence_Fault;
+    ENDWHILE
+    RETURN;       
+ENDPROC
+!######################################################################################   
+
+!######################################################################################
+! INITIALIZE BOOLEANS AND FLAGS      
+PROC SetFlags()    
+bReject:=FALSE; 
+bCycle_Stop:=FALSE; 
+bSafe:=FALSE;  
+bPalletinPlace:=FALSE;
+ENDPROC
+!######################################################################################
+
+
+!######################################################################################
+! INITIALIZE IO's -----> TO BE EXPANDED TO INCLUDE SENSORS FOR GRIPPER AND PLC COMMUNICATION SIGNALS 
+    PROC InitializeIO()
+        Reset Air_Fault;
+        Reset Robot_Auto;
+        Reset Robot_Manual;
+        Reset Load_Cartons;
+        Reset Load_Cartons;
+        Reset Load_Pallets;
+        Reset Production_Exec_Error;
+        Reset Sequence_Fault;
+        Reset PlacedCarton;
+        Reset Start_Home_DO;
+        Reset EndCycle;
+        !Reset Power_Fail_Error;
+        Reset GripCarton;
+      !  Reset Attach2;
+        Reset Sequence_Fault;
+!        Reset Picked_Product;
+        Reset PalletFull;
+      !  WaitUntil Line_1 = 1 OR Line_1 = 2; 
+!        Reset Released_Product;
+!        Reset RobHome;
+    ENDPROC
+!######################################################################################  
+
+
+!######################################################################################
+! HOMING PROCEDURE ----> TO BE EXPANDED
+! GET CURRENT POSITION OF ROBOT AND DETERMINE MOVEMENTS
+   PROC Homing()
+         Current_Position:=CPos(\Tool:=Tooldata_1 \WObj:=wobj0);
+       Current_Position1:=CRobt(\Tool:=Tooldata_1 \WObj:=wobj0);
+         p10 := CRobT(\Tool:=Tooldata_1 \WObj:=wobj0);
+        bSafe:=FALSE;
+        IF Current_Position1= Home_1 THEN
+            bSafe:=TRUE;
+            SetDO RobHome,1;
+            RETURN;
+        ENDIF
+    IF PalletSensor = 1 AND (PalletFull=1 OR Products1<>0) THEN
+        WaitDI PalletSensor,0;
+    ENDIF
+IF Current_Position1.trans.y > 0 THEN
+        IF Current_Position1.trans.x < 0 THEN
+              IF Current_Position1.trans.z > 280 THEN
+            !  MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+              MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+              Set RobHome;
+               bSafe:=TRUE;
+           ELSE
+               IF Current_Position1.trans.z <100 THEN
+                 MoveL Offs(Current_Position1,0,0,800),v500,z5,Tooldata_1\WObj:=wobj0;
+               !   MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                bSafe:=TRUE;
+                  Set RobHome;
+               ELSE
+                 MoveL Offs(Current_Position1,0,0,600),v500,z5,Tooldata_1\WObj:=wobj0;
+              !    MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                bSafe:=TRUE;
+                  Set RobHome;
+               ENDIF               
+          ENDIF           
+        ELSEIF Current_Position1.trans.x > 0 THEN
+                   IF Current_Position1.trans.z > 600 THEN
+                 !    MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                     MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                     Set RobHome;
+                     bSafe:=TRUE;
+                   ELSE
+                  MoveL Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
+                !   MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                   bSafe:=TRUE;
+                  Set RobHome;  
+                   ENDIF       
+        ENDIF
+        
+ELSEIF Current_Position1.trans.y<0 THEN
+    
+             IF Current_Position1.trans.x < 0 THEN
+                 
+              IF Current_Position1.trans.z > 1050 THEN
+           !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+              MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+              Set RobHome;
+               bSafe:=TRUE;
+           ELSE
+               IF Current_Position1.trans.z <800 THEN
+                 MoveL Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
+              !    MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                bSafe:=TRUE;
+                  Set RobHome;
+               ELSE
+                 MoveL Offs(Current_Position1,0,0,600),v500,z5,Tooldata_1\WObj:=wobj0;
+               !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                bSafe:=TRUE;
+                  Set RobHome;
+               ENDIF               
+          ENDIF           
+        ELSEIF Current_Position1.trans.x > 0 THEN
+                   IF Current_Position1.trans.z > 500 THEN
+                !     MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                     MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                     Set RobHome;
+                     bSafe:=TRUE;
+                   ELSE
+                  MoveJ Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
+                !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
+                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
+                   bSafe:=TRUE;
+                  Set RobHome;  
+                   ENDIF       
+        ENDIF           
+        ENDIF     
+   
+
+WaitTime 2;
+    ENDPROC 
+!######################################################################################   
+
+
+     PROC Stop()
+         StopMove;
+    ENDPROC
+
+
+ !######################################################################################
+! PROCEDURE TO TEST GRIPPER MOVEMENT      
+PROC GripperTest()
+     Dettach;
+     Attach1;
+     Dettach;
+     Attach1;
+ENDPROC
+ !######################################################################################  
+
+!######################################################################################
+! PROCEDURE TO INITIALIZE     
+    PROC Initialize()
+    AccSet 100,70;
+    MaxVel:=vmax;
+   ! NumOfPallets:=0;
+    CountPallets:=0;
+    Boxes1:=0;
+    Boxes2:=0;
+    Trays1:=0;
+    Products1:=0;
+    SetDO Attach2,0;
+    SetDO RobHome,0;
+    VelocityPercentage:=0;
+    SetDO Error_Gen,0;
+   ! ErrorCode:=ERRNO;
+    !Workobject_Carton.oframe.trans.z:=0;
+    !MoveJ Target_10,v3000,fine,Tooldata_1\WObj:=wobj0;
+    ! SetDO Attach,0; 
+    ENDPROC   
+!######################################################################################   
+
+
+!######################################################################################
+! PROCEDURE TO GRIP ITEM - AIR ON      
+    PROC Attach1()
+        WaitTime 0.7; 
+        !Grip
+        SetDO D652_10_DO2,0;
+        SetDO D652_10_DO1,1;
+        SetDO D652_10_DO4,0;
+        SetDO D652_10_DO3,1;
+        SetDO Attach2,1;
+        WaitTime 0.7;
+    ENDPROC
+!###################################################################################### 
+    
+    
+ !######################################################################################
+! PROCEDURE TO RELEASE ITEM - AIR OFF
+!!!! NEED TO INCORPORATE SOME GRIPPING FEEDBACK FUNCTION TO ENSURE ITEM REMAINS GRIPPED 
+!!!! GRIPPER SENSORS    
+    PROC Dettach() 
+        WaitTime 1; 
+        !Release
+        SetDO Attach2,0;
+        SetDO D652_10_DO1,0;
+        SetDO Attach2,0;
+        SetDO D652_10_DO2,1;
+        WaitTime 0.3;
+        SetDO D652_10_DO4,1;
+        SetDO D652_10_DO3,0;
+        SetDO Attach2,0;
+        WaitTime 1; 
+    ENDPROC
+ !######################################################################################   
+    
+    
+  
+!#####################################################################################
+! PROCEDURE TO ATTACH CARTON SIGNAL - VACUUM ON   
+       PROC AttachCarton()
+       !  WaitTime 0.5; 
+         WaitTime 0.5;
+         SetDO GripCarton,1;
+         SetDO DettachCarton1,0;
+          WaitTime 0.5; 
+    ENDPROC
+!#####################################################################################
+    
+
+
+!#####################################################################################
+! PROCEDURE TO DETTACH CARTON SIGNAL - VACUUM OFF       
+    PROC DettachCarton()
+         WaitTime 0.5; 
+         SetDO GripCarton,0;
+        SetDO DettachCarton1,1;
+          WaitTime 1.5; 
+    ENDPROC
+!#####################################################################################   
+    
+   
+
+!#####################################################################################
+! PROCEDURE TO ATTACH PALLET SIGNAL   
+       PROC AttachPallet()
+         WaitTime 0.5; 
+         WaitTime 0.5;
+         SetDO Attach3,1;
+        ! SetDO DettachCarton1,0;
+          WaitTime 0.5; 
+    ENDPROC
+!#####################################################################################
+ 
+
+!#####################################################################################
+! PROCEDURE TO DETTACH PALLET - VACUUM OFF       
+    PROC DettachPallet()
+         WaitTime 0.5; 
+         SetDO Attach3,0;
+     !   SetDO DettachCarton1,1;
+          WaitTime 1.5; 
+    ENDPROC
+!#####################################################################################  
+ 
+!#####################################################################################
+! PROCEDURE TO TEST BOARDS 
+
+PROC TestIO()
+     IF (IOUnitState ("PN_Internal_Anybus")= IOUNIT_RUNNING) THEN
+      ! PROFINET MODULE RUNNING
+    ELSE
+      ! Read/Write signal on the I/O unit result in error
+      TPErase;
+      TPWrite "PN_Internal_Anybus-adapter  broken";
+    ENDIF
+    
+    IF (IOUnitState ("D652_10")= IOUNIT_RUNNING) THEN
+      ! Possible to access the signal on the I/O unit
+    ELSE
+      ! Read/Write signal on the I/O unit result in error
+      TPErase;
+      TPWrite "D652_10  broken";
+    ENDIF
+        
+    ! *** IOBusState ***
+    ! 0 BUSSTATE_HALTED 
+    ! 1 BUSSTATE_RUN     
+    ! 2 BUSSTATE_ERROR   
+    ! 3 BUSSTATE_STARTUP 
+    ! 4 BUSSTATE_INIT    
+        
+    IOBusState "PROFINET_Anybus", bstate;
+    TEST bstate
+    CASE BUSSTATE_RUN:
+    TPWrite "PROFINET OK";
+      ! Possible to access the signal on the I/O unit
+    DEFAULT:
+      ! Read/Write signal on the I/O unit result in error
+      TPErase;
+      TPWrite "PROFINET_Anybus  broken";
+    ENDTEST
+    RETURN;
+    
+    
+ENDPROC
+!#####################################################################################
+
+
+!#################################################################################  
+    !!! PROCEDURE FOR PICK & PLACE OF CARTON ON PALLET !!!    
+    PROC PlaceCarton()
+	! Workobject_2.oframe.trans.z:=Z2offset;
+    IF Carton_Sensor_Empty=1 THEN
+        IF Carton_Sensor_Low = 0 THEN
+            TPWrite "Warning - Low Level Cartons";
+        ENDIF
+        SetDO PlacedCarton,0;
+        WaitTime 0.5; 
+   MoveJ Offs(Cartons_Approach_2,0,0,0),vmax,z10,Tooldata_1\WObj:=wobj0; 
+SetDO D652_10_DO2,0;
+SetDO D652_10_DO1,1;
+      MoveJ Cartons_Approach,vmax,z10,Tooldata_1\WObj:=wobj0;   
+      MoveL Cartons_Start_2,vmax,z10,Tooldata_1\WObj:=wobj0;  
+     SearchL\SStop, Empty,\Flanks,Cartons_Start,Cartons_End,v100,Tooldata_1\WObj:=wobj0;
+     WaitTime 0.5; 
+      AttachCarton;
+       WaitTime 0.3; 
+      MoveL Cartons_Start_2,v1000,z10,Tooldata_1\WObj:=wobj0;  
+      MoveL Cartons_Approach,v1000,z10,Tooldata_1\WObj:=wobj0; 
+        MoveL Cartons_Approach_2,v1000,z10,Tooldata_1\WObj:=wobj0; 
+          MoveJ Offs(Cartons_Placer,0,0,300),v1000,fine,Tooldata_1\WObj:=Workobject_3; 
+      MoveL Offs(Cartons_Placer,0,0,30),v1000,fine,Tooldata_1\WObj:=Workobject_3; 
+      WaitTime 0.5; 
+          DettachCarton;
+          SetDO Attach2,0;
+          SetDO PlacedCarton,1;
+      WaitTime 0.5;     
+        SetDO PlacedCarton,1;
+         MoveJ Offs(Cartons_Placer,0,0,100),vmax,fine,Tooldata_1\WObj:=Workobject_3; 
+    ELSE
+          TPWrite"Carton Tray Empty - Load Cartons to Continue";
+          SetDO Load_Cartons,0;
+          WaitUntil Carton_Sensor_Empty=1;
+          WaitDI Cartons_Loaded,1;
+    ENDIF
+         
+    ERROR
+    IF ERRNO = ERR_WHLSEARCH THEN    
+    errorid:=ERRNO;
+    Set Sequence_Fault;
+    SetGO ErrorCode,ERRNO;
+    SetDO Error_Gen,1;
+    StorePath; 
+    SetDO Load_Cartons,0;
+    MoveJ Cartons_Start_2,v800,z100,Tooldata_1\WObj:=wobj0;
+    TPWrite "Insert Cartons";
+    TPWrite "ErrorID: "+ NumToStr(errorid,0);
+    ErrWrite "ERR_WHLSEARCH","Error while searching Cartons";
+   ! ErrLog errorid,ERRSTR_TASK,arg,ERRSTR_CONTEXT,ERRSTR_UNUSED,ERRSTR_UNUSED;
+    !ErrLog errorid\W,ERRSTR_TASK,arg,ERRSTR_CONTEXT,ERRSTR_UNUSED,ERRSTR_UNUSED;
+    !SetDO Load_Cartons,1;
+    WaitDI Carton_Sensor_Empty,1; WaitDI Carton_Sensor_Low,1;
+    WaitDI Reset_Exec_Error,1;
+    SetDO Error_Gen,0;
+    Reset Sequence_Fault;
+    RestoPath;
+    ClearPath;
+    StartMove;
+    RETRY;
+    ENDIF 
+   IF ERRNO=ERR_EXCRTYMAX THEN
+    errorid:=ERRNO;
+    SetGO ErrorCode,ERRNO;
+    TPWrite "Restore System Manually";
+    TPWrite "ErrorID: "+ NumToStr(errorid,0);
+    ErrWrite "MAX TRIES FOR RESTORING ERROR","Error while searching Cartons";
+    WaitDI Reset_Exec_Error,1;
+    RETURN;
+    ENDIF 
+        
+!       IF ERRNO = ERR_WHLSEARCH THEN
+!    Set Sequence_Fault;
+!       StorePath; 
+!    SetDO Load_Cartons,0;
+!      MoveL Cartons_Start,v800,fine,Tooldata_1\WObj:=wobj0;
+!      WaitDI Cartons_Loaded,1;
+!      Reset Sequence_Fault;
+!      TPWrite "Insert Empty";
+!      RestoPath;
+!      ClearPath;
+!      StartMove;    
+!      RETRY;
+!    ENDIF
+    ENDPROC
+!#################################################################################    
+    
+
+!#################################################################################  
+PROC Test_Rob_Lim()
+MoveL Offs(Pick_1_2_2,0,-400,100),vmax,z50,Tooldata_1\WObj:=wobj0; 
+IF bReachable=1 THEN
+ MoveL Offs(Pick_1_2_2,0,-400,3000),vmax,z50,Tooldata_1\WObj:=wobj0; 
+ELSE
+Homing;
+ENDIF
+ 
+ 
+ENDPROC
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+!#################################################################################  
+    !!! PROCEDURE FOR PICK & PLACE OF PALLET !!!    
+    PROC PlacePallet()
+	! Workobject_2.oframe.trans.z:=Z2offset;
+        SetDO Placed_Pallet,0;
+        WaitTime 0.5; 
+       ! Homing;
+   MoveJ Offs(Pick_Pallet_Approach,0,0,0),vmax,z10,Tooldata_1\WObj:=wobj0; 
+      MoveJ Pick_Pallet_Approach_2,vmax,z10,Tooldata_1\WObj:=wobj0;   
+      
+      MoveJ Pick_Pallet_Start_2,vmax,z10,Tooldata_1\WObj:=wobj0;  
+     SearchL\SStop, Empty,\Flanks,Pick_Pallet_Start,Pick_Pallet_Finish,v100,Tooldata_1\WObj:=wobj0;
+     WaitTime 0.5; 
+      AttachPallet;
+       WaitTime 0.3; 
+      MoveL Pick_Pallet_Start_2,v1000,z10,Tooldata_1\WObj:=wobj0;  
+      MoveJ Pick_Pallet_Approach_2,v1000,z10,Tooldata_1\WObj:=wobj0; 
+        MoveL Pick_Pallet_Approach,v1000,z10,Tooldata_1\WObj:=wobj0; 
+        
+          !MoveJ Offs(Cartons_Placer,0,0,300),v1000,fine,Tooldata_1\WObj:=wobj0; 
+      MoveJ Pallet_Placer_2_2,v1000,fine,Tooldata_1\WObj:=wobj0; 
+            MoveJ Pallet_Placer_2,v1000,fine,Tooldata_1\WObj:=wobj0; 
+      WaitTime 0.5; 
+          DettachPallet;
+          SetDO Attach3,0;
+          SetDO Placed_Pallet,1;
+      WaitTime 0.5;     
+        SetDO Placed_Pallet,1;
+         MoveJ Offs(Pallet_Placer_2_2,0,0,100),vmax,fine,Tooldata_1\WObj:=wobj0; 
+        ERROR
+       IF ERRNO = ERR_WHLSEARCH THEN
+           Set Sequence_Fault;
+       StorePath; 
+        SetDO Load_Pallets,0;
+      MoveL Pick_Pallet_Start,vmax,fine,Tooldata_1\WObj:=wobj0;
+      ! NEED TO CHANGE SIGNAL TO PALLETS LOADED DI!!
+      WaitDI Cartons_Loaded,1;
+      Reset Sequence_Fault;
+      TPWrite "Insert Empty";
+      RestoPath;
+      ClearPath;
+      StartMove;    
+      RETRY;
+    ENDIF
+    ENDPROC
+!#################################################################################    
+  
+!#################################################################################    
+!PROCEDURE TO SET INITIAL SPEED FROM HMI
+PROC SetSpeed()
+    
+      ! HMI Use
+      vel_operation:=Vel_Percentage;
+      
+!!       PC Interface Use
+!      vel_operation:=VelocityPercentage;
+      
+      WHILE vel_operation=0 DO
+        TPErase;
+        TPWrite " Speed setted from PLC is zero";
+        TPWrite " Waiting for value greater than zero";
+        
+!        ! PC Interface Use
+!        WaitUntil VelocityPercentage>0;
+!        WaitTime 1;
+        
+        ! HMI Use
+        vel_operation:=Vel_Percentage;
+        
+!        ! PC Interface Use
+!        vel_operation:=VelocityPercentage;
+        
+        TPErase;
+      ENDWHILE
+    IF vel_operation>100 vel_operation:=100;
+    IF vel_operation<20 vel_operation:=20;
+    VelSet vel_operation,7000;
+  ENDPROC   
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+!#################################################################################    NEEDS FURTHER WORK FOR DETERMINING REACHABILITY #################
+   PROC CheckReachable (robtarget robtarget_reach, PERS tooldata Tooldata_1)!,\PERS wobjdata Workobject_2)
+
+    VAR jointtarget jntReach; 
+    bReachable:=1;
+    !IF present (Workobject_2) THEN 
+       ! jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_2);
+   ! ELSE
+        jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_2);
+   ! ENDIF
+    ERROR
+      IF ERRNO=ERR_ROBLIMIT  THEN 
+          bReachable:=2;
+          TPWrite "Not Reachable";
+          Homing;
+          !TPWrite "Not Reachable";
+          StopMove;
+          TRYNEXT;
+      ENDIF
+          IF ERRNO=ERR_OUTSIDE_REACH  THEN 
+          bReachable:=2;
+          TPWrite "Not Reachable";
+          Homing;
+          !TPWrite "Not Reachable";
+          StopMove;
+          TRYNEXT;
+      ENDIF
+   ENDPROC
+!#################################################################################   
+
+
+
+!#################################################################################    NEEDS FURTHER WORK FOR DETERMINING REACHABILITY #################
+   PROC CheckReachable1 (robtarget robtarget_reach, PERS tooldata Tooldata_1,\PERS wobjdata Workoject_1)
+
+    VAR jointtarget jntReach; 
+    bReachable:=1;
+    IF present (Workobject_1) THEN 
+        jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_1);
+    ELSE
+        jntReach:=CalcJointT(robtarget_reach,Tooldata_1);
+    ENDIF
+    ERROR
+      IF ERRNO=ERR_ROBLIMIT  THEN 
+          bReachable:=2;
+          TPWrite "Not Reachable";
+          Homing;
+          !TPWrite "Not Reachable";
+          StopMove;
+          TRYNEXT;
+      ENDIF
+          IF ERRNO=ERR_OUTSIDE_REACH  THEN 
+          bReachable:=2;
+          TPWrite "Not Reachable";
+          Homing;
+         ! TPWrite "Not Reachable";
+          StopMove;
+          TRYNEXT;
+      ENDIF
+   ENDPROC
+!#################################################################################   
+    
+    
+    TRAP Traproutine
+     StopMove;
+     WaitUntil Continue=1 OR Restart =1 OR EndCycle=1;
+     Current_Position:=CPos(\Tool:=tool0 \WObj:=wobj0);
+     IF Continue=1 THEN
+        StorePath;
+         WaitDI Interrupt,0;
+           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0); 
+            RestoPath;
+         StartMove;
+     ENDIF
+     IF Restart=1 THEN
+         ClearPath;
+           WaitDI Interrupt,0;
+         IDelete ErrorInt;
+         StartMove;
+         ExitCycle;
+     ENDIF
+     IF EndCycle=1 THEN
+         Homing;
+          StopMove;
+          StorePath;
+            MoveJ Home_1,v3000,fine,Tooldata_1\WObj:=wobj0;
+           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0);
+         WaitDI Interrupt,0;
+         ClearPath;
+         TPWrite "Stop at end of Cycle";
+         bProgEND:=TRUE;
+!          ExitCycle;
+     ENDIF
+       ERROR
+         IF ERRNO = ERR_WHLSEARCH THEN
+       StorePath; 
+     SetDO Load_Cartons,0;
+      MoveJ Cartons_Start_2,vmax,z100,tool0\WObj:=wobj0;
+      WaitDI Cartons_Loaded,1;
+      TPWrite "Insert";
+      SetDO Load_Cartons,1;
+      RestoPath;
+      ClearPath;
+      StartMove;
+      RETRY;
+         endif
+ ENDTRAP  
+  
+ 
+     !! Traproutine connected to collision error
+     TRAP Traproutine2
+        !Reset Homing_button;
+!        StopMove;
+!        StorePath;
+!         WaitDI Homing_Button,0;
+!           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0); 
+!            RestoPath;
+!         StartMove;
+         Current_Position:=CPos(\Tool:=Tooldata_1 \WObj:=wobj0);
+          WaitDI Homing_Button,0;
+            TPWrite "Press Start to GO TO HOME";
+            WaitTime 2;
+        !  WaitDI Start_Home_DI,1;
+             Homing;
+             StopMove;
+            StorePath;
+          !Homing;
+         ! WaitTime 2;
+       !   StopMove;
+      ! RestoPath;
+        !  StartMove;
+           !MoveJ Home_1,v3000,fine,Tooldata_1\WObj:=wobj0;
+         ClearPath;
+         ExitCycle;
+         ReSet Start_Home_DO;  
+    ENDTRAP
+ 
+TRAP Traproutine3
+VAR num speed_corr;
+WaitDI Velocity_Control,0;
+
+!Include a velocity Set DI  with DO crossconnection
+
+!HMI Use
+vel_operation := Vel_Percentage;
+
+!!PC Interface Use
+!vel_operation:= VelocityPercentage;
+
+VelSet vel_operation,7000;
+ERROR
+IF ERRNO = ERR_SPEED_REFRESH_LIM THEN
+IF vel_operation > 100 THEN 
+    vel_operation := 100;
+ENDIF
+IF vel_operation < 0 THEN
+vel_operation := 0;
+ENDIF
+RETURN;
+ENDIF
+ENDTRAP
+
+
+! #####################################################################################
 ! MAIN PROCEDURE   
     
     PROC main()
@@ -880,752 +1557,4 @@ ERROR
     ENDPROC
     
 
-    
-!######################################################################################
-! CHECK AIR PRESSURE SYSTEM ----> SIGNAL TO BE SUPPLIED BY PLC USING ANALOGUE MEASUREMENTS OR A SIMPLE DI / DO      
-PROC CheckAir()
-    WHILE Air_On=0 DO
-        Set Air_Fault;
-        Set Sequence_Fault;
-        TPWrite "Air Supply Problem";
-        TPWrite "Check Compressed Air Supply";
-        TPWrite "Wait for Fault Rectification";
-        WaitDI Air_On,1; 
-        Reset Air_Fault;
-        Reset Sequence_Fault;
-    ENDWHILE
-    RETURN;       
-ENDPROC
-!######################################################################################   
-
-
-
-
-!######################################################################################
-! INITIALIZE BOOLEANS AND FLAGS      
-PROC SetFlags()    
-bReject:=FALSE; 
-bCycle_Stop:=FALSE; 
-bSafe:=FALSE;  
-bPalletinPlace:=FALSE;
-ENDPROC
-!######################################################################################
-
-
-!######################################################################################
-! INITIALIZE IO's -----> TO BE EXPANDED TO INCLUDE SENSORS FOR GRIPPER AND PLC COMMUNICATION SIGNALS 
-    PROC InitializeIO()
-        Reset Air_Fault;
-        Reset Robot_Auto;
-        Reset Robot_Manual;
-        Reset Load_Cartons;
-        Reset Load_Cartons;
-        Reset Load_Pallets;
-        Reset Production_Exec_Error;
-        Reset Sequence_Fault;
-        Reset PlacedCarton;
-        Reset Start_Home_DO;
-        Reset EndCycle;
-        !Reset Power_Fail_Error;
-        Reset GripCarton;
-      !  Reset Attach2;
-        Reset Sequence_Fault;
-!        Reset Picked_Product;
-        Reset PalletFull;
-      !  WaitUntil Line_1 = 1 OR Line_1 = 2; 
-!        Reset Released_Product;
-!        Reset RobHome;
-    ENDPROC
-!######################################################################################    
-    
-
-
-
-    
-!######################################################################################
-! HOMING PROCEDURE ----> TO BE EXPANDED
-! GET CURRENT POSITION OF ROBOT AND DETERMINE MOVEMENTS
-   PROC Homing()
-         Current_Position:=CPos(\Tool:=Tooldata_1 \WObj:=wobj0);
-       Current_Position1:=CRobt(\Tool:=Tooldata_1 \WObj:=wobj0);
-         p10 := CRobT(\Tool:=Tooldata_1 \WObj:=wobj0);
-        bSafe:=FALSE;
-        IF Current_Position1= Home_1 THEN
-            bSafe:=TRUE;
-            SetDO RobHome,1;
-            RETURN;
-        ENDIF
-    IF PalletSensor = 1 AND (PalletFull=1 OR Products1<>0) THEN
-        WaitDI PalletSensor,0;
-    ENDIF
-IF Current_Position1.trans.y > 0 THEN
-        IF Current_Position1.trans.x < 0 THEN
-              IF Current_Position1.trans.z > 280 THEN
-            !  MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-              MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-              Set RobHome;
-               bSafe:=TRUE;
-           ELSE
-               IF Current_Position1.trans.z <100 THEN
-                 MoveL Offs(Current_Position1,0,0,800),v500,z5,Tooldata_1\WObj:=wobj0;
-               !   MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                bSafe:=TRUE;
-                  Set RobHome;
-               ELSE
-                 MoveL Offs(Current_Position1,0,0,600),v500,z5,Tooldata_1\WObj:=wobj0;
-              !    MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                bSafe:=TRUE;
-                  Set RobHome;
-               ENDIF               
-          ENDIF           
-        ELSEIF Current_Position1.trans.x > 0 THEN
-                   IF Current_Position1.trans.z > 600 THEN
-                 !    MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                     MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                     Set RobHome;
-                     bSafe:=TRUE;
-                   ELSE
-                  MoveL Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
-                !   MoveL Homing_Right_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                   bSafe:=TRUE;
-                  Set RobHome;  
-                   ENDIF       
-        ENDIF
-        
-ELSEIF Current_Position1.trans.y<0 THEN
-    
-             IF Current_Position1.trans.x < 0 THEN
-                 
-              IF Current_Position1.trans.z > 1050 THEN
-           !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-              MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-              Set RobHome;
-               bSafe:=TRUE;
-           ELSE
-               IF Current_Position1.trans.z <800 THEN
-                 MoveL Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
-              !    MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                bSafe:=TRUE;
-                  Set RobHome;
-               ELSE
-                 MoveL Offs(Current_Position1,0,0,600),v500,z5,Tooldata_1\WObj:=wobj0;
-               !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                bSafe:=TRUE;
-                  Set RobHome;
-               ENDIF               
-          ENDIF           
-        ELSEIF Current_Position1.trans.x > 0 THEN
-                   IF Current_Position1.trans.z > 500 THEN
-                !     MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                     MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                     Set RobHome;
-                     bSafe:=TRUE;
-                   ELSE
-                  MoveJ Offs(Current_Position1,0,0,1000),v500,z5,Tooldata_1\WObj:=wobj0;
-                !   MoveL Homing_Left_Approach,v500,z100,Tooldata_1\WObj:=wobj0;
-                  MoveJ Home_1,v500,z5,Tooldata_1\WObj:=wobj0;
-                   bSafe:=TRUE;
-                  Set RobHome;  
-                   ENDIF       
-        ENDIF           
-        ENDIF     
-   
-
-WaitTime 2;
-    ENDPROC 
-!######################################################################################   
-    
-    
-     PROC Stop()
-         StopMove;
-    ENDPROC
-    
-    
- !######################################################################################
-! PROCEDURE TO TEST GRIPPER MOVEMENT      
-    PROC GripperTest()
-    ! Attach1;
-     Dettach;
-     Attach1;
-     Dettach;
-    Attach1;
-        ENDPROC
- !######################################################################################  
-    
- 
- 
-!######################################################################################
-! PROCEDURE TO INITIALIZE     
-    PROC Initialize()
-    AccSet 100,70;
-    MaxVel:=vmax;
-   ! NumOfPallets:=0;
-    CountPallets:=0;
-    Boxes1:=0;
-    Boxes2:=0;
-    Trays1:=0;
-    Products1:=0;
-    SetDO Attach2,0;
-    SetDO RobHome,0;
-    VelocityPercentage:=0;
-    SetDO Error_Gen,0;
-   ! ErrorCode:=ERRNO;
-    !Workobject_Carton.oframe.trans.z:=0;
-    !MoveJ Target_10,v3000,fine,Tooldata_1\WObj:=wobj0;
-    ! SetDO Attach,0; 
-    ENDPROC   
-!######################################################################################    
-
-    
-!######################################################################################
-! PROCEDURE TO GRIP ITEM - AIR ON      
-    PROC Attach1()
-        WaitTime 0.7; 
-        !Grip
-        SetDO D652_10_DO2,0;
-        SetDO D652_10_DO1,1;
-        SetDO D652_10_DO4,0;
-        SetDO D652_10_DO3,1;
-        SetDO Attach2,1;
-        WaitTime 0.7;
-    ENDPROC
-!###################################################################################### 
-    
-    
- !######################################################################################
-! PROCEDURE TO RELEASE ITEM - AIR OFF
-!!!! NEED TO INCORPORATE SOME GRIPPING FEEDBACK FUNCTION TO ENSURE ITEM REMAINS GRIPPED 
-!!!! GRIPPER SENSORS    
-    PROC Dettach() 
-        WaitTime 1; 
-        !Release
-        SetDO Attach2,0;
-        SetDO D652_10_DO1,0;
-        SetDO Attach2,0;
-        SetDO D652_10_DO2,1;
-        WaitTime 0.3;
-        SetDO D652_10_DO4,1;
-        SetDO D652_10_DO3,0;
-        SetDO Attach2,0;
-        WaitTime 1; 
-    ENDPROC
- !######################################################################################   
-    
-    
-  
-!#####################################################################################
-! PROCEDURE TO ATTACH CARTON SIGNAL - VACUUM ON   
-       PROC AttachCarton()
-       !  WaitTime 0.5; 
-         WaitTime 0.5;
-         SetDO GripCarton,1;
-         SetDO DettachCarton1,0;
-          WaitTime 0.5; 
-    ENDPROC
-!#####################################################################################
-    
-
-
-!#####################################################################################
-! PROCEDURE TO DETTACH CARTON SIGNAL - VACUUM OFF       
-    PROC DettachCarton()
-         WaitTime 0.5; 
-         SetDO GripCarton,0;
-        SetDO DettachCarton1,1;
-          WaitTime 1.5; 
-    ENDPROC
-!#####################################################################################   
-    
-   
-
-!#####################################################################################
-! PROCEDURE TO ATTACH PALLET SIGNAL   
-       PROC AttachPallet()
-         WaitTime 0.5; 
-         WaitTime 0.5;
-         SetDO Attach3,1;
-        ! SetDO DettachCarton1,0;
-          WaitTime 0.5; 
-    ENDPROC
-!#####################################################################################
- 
-
-!#####################################################################################
-! PROCEDURE TO DETTACH PALLET - VACUUM OFF       
-    PROC DettachPallet()
-         WaitTime 0.5; 
-         SetDO Attach3,0;
-     !   SetDO DettachCarton1,1;
-          WaitTime 1.5; 
-    ENDPROC
-!#####################################################################################  
- 
-!#####################################################################################
-! PROCEDURE TO TEST BOARDS 
-
-PROC TestIO()
-     IF (IOUnitState ("PN_Internal_Anybus")= IOUNIT_RUNNING) THEN
-      ! PROFINET MODULE RUNNING
-    ELSE
-      ! Read/Write signal on the I/O unit result in error
-      TPErase;
-      TPWrite "PN_Internal_Anybus-adapter  broken";
-    ENDIF
-    
-    IF (IOUnitState ("D652_10")= IOUNIT_RUNNING) THEN
-      ! Possible to access the signal on the I/O unit
-    ELSE
-      ! Read/Write signal on the I/O unit result in error
-      TPErase;
-      TPWrite "D652_10  broken";
-    ENDIF
-        
-    ! *** IOBusState ***
-    ! 0 BUSSTATE_HALTED 
-    ! 1 BUSSTATE_RUN     
-    ! 2 BUSSTATE_ERROR   
-    ! 3 BUSSTATE_STARTUP 
-    ! 4 BUSSTATE_INIT    
-        
-    IOBusState "PROFINET_Anybus", bstate;
-    TEST bstate
-    CASE BUSSTATE_RUN:
-    TPWrite "PROFINET OK";
-      ! Possible to access the signal on the I/O unit
-    DEFAULT:
-      ! Read/Write signal on the I/O unit result in error
-      TPErase;
-      TPWrite "PROFINET_Anybus  broken";
-    ENDTEST
-    RETURN;
-    
-    
-ENDPROC
-!#####################################################################################
-
-
-
-
-
-
-    
-!#################################################################################  
-    !!! PROCEDURE FOR PICK & PLACE OF CARTON ON PALLET !!!    
-    PROC PlaceCarton()
-	! Workobject_2.oframe.trans.z:=Z2offset;
-    IF Carton_Sensor_Empty=1 THEN
-        IF Carton_Sensor_Low = 0 THEN
-            TPWrite "Warning - Low Level Cartons";
-        ENDIF
-        SetDO PlacedCarton,0;
-        WaitTime 0.5; 
-   MoveJ Offs(Cartons_Approach_2,0,0,0),vmax,z10,Tooldata_1\WObj:=wobj0; 
-SetDO D652_10_DO2,0;
-SetDO D652_10_DO1,1;
-      MoveJ Cartons_Approach,vmax,z10,Tooldata_1\WObj:=wobj0;   
-      MoveL Cartons_Start_2,vmax,z10,Tooldata_1\WObj:=wobj0;  
-     SearchL\SStop, Empty,\Flanks,Cartons_Start,Cartons_End,v100,Tooldata_1\WObj:=wobj0;
-     WaitTime 0.5; 
-      AttachCarton;
-       WaitTime 0.3; 
-      MoveL Cartons_Start_2,v1000,z10,Tooldata_1\WObj:=wobj0;  
-      MoveL Cartons_Approach,v1000,z10,Tooldata_1\WObj:=wobj0; 
-        MoveL Cartons_Approach_2,v1000,z10,Tooldata_1\WObj:=wobj0; 
-          MoveJ Offs(Cartons_Placer,0,0,300),v1000,fine,Tooldata_1\WObj:=Workobject_3; 
-      MoveL Offs(Cartons_Placer,0,0,30),v1000,fine,Tooldata_1\WObj:=Workobject_3; 
-      WaitTime 0.5; 
-          DettachCarton;
-          SetDO Attach2,0;
-          SetDO PlacedCarton,1;
-      WaitTime 0.5;     
-        SetDO PlacedCarton,1;
-         MoveJ Offs(Cartons_Placer,0,0,100),vmax,fine,Tooldata_1\WObj:=Workobject_3; 
-    ELSE
-          TPWrite"Carton Tray Empty - Load Cartons to Continue";
-          SetDO Load_Cartons,0;
-          WaitUntil Carton_Sensor_Empty=1;
-          WaitDI Cartons_Loaded,1;
-    ENDIF
-         
-    ERROR
-    IF ERRNO = ERR_WHLSEARCH THEN    
-    errorid:=ERRNO;
-    Set Sequence_Fault;
-    SetGO ErrorCode,ERRNO;
-    SetDO Error_Gen,1;
-    StorePath; 
-    SetDO Load_Cartons,0;
-    MoveJ Cartons_Start_2,v800,z100,Tooldata_1\WObj:=wobj0;
-    TPWrite "Insert Cartons";
-    TPWrite "ErrorID: "+ NumToStr(errorid,0);
-    ErrWrite "ERR_WHLSEARCH","Error while searching Cartons";
-   ! ErrLog errorid,ERRSTR_TASK,arg,ERRSTR_CONTEXT,ERRSTR_UNUSED,ERRSTR_UNUSED;
-    !ErrLog errorid\W,ERRSTR_TASK,arg,ERRSTR_CONTEXT,ERRSTR_UNUSED,ERRSTR_UNUSED;
-    !SetDO Load_Cartons,1;
-    WaitDI Carton_Sensor_Empty,1; WaitDI Carton_Sensor_Low,1;
-    WaitDI Reset_Exec_Error,1;
-    SetDO Error_Gen,0;
-    Reset Sequence_Fault;
-    RestoPath;
-    ClearPath;
-    StartMove;
-    RETRY;
-    ENDIF 
-   IF ERRNO=ERR_EXCRTYMAX THEN
-    errorid:=ERRNO;
-    SetGO ErrorCode,ERRNO;
-    TPWrite "Restore System Manually";
-    TPWrite "ErrorID: "+ NumToStr(errorid,0);
-    ErrWrite "MAX TRIES FOR RESTORING ERROR","Error while searching Cartons";
-    WaitDI Reset_Exec_Error,1;
-    RETURN;
-    ENDIF 
-        
-!       IF ERRNO = ERR_WHLSEARCH THEN
-!    Set Sequence_Fault;
-!       StorePath; 
-!    SetDO Load_Cartons,0;
-!      MoveL Cartons_Start,v800,fine,Tooldata_1\WObj:=wobj0;
-!      WaitDI Cartons_Loaded,1;
-!      Reset Sequence_Fault;
-!      TPWrite "Insert Empty";
-!      RestoPath;
-!      ClearPath;
-!      StartMove;    
-!      RETRY;
-!    ENDIF
-    ENDPROC
-!#################################################################################    
-    
-
-!#################################################################################  
-PROC Test_Rob_Lim()
-MoveL Offs(Pick_1_2_2,0,-400,100),vmax,z50,Tooldata_1\WObj:=wobj0; 
-IF bReachable=1 THEN
- MoveL Offs(Pick_1_2_2,0,-400,3000),vmax,z50,Tooldata_1\WObj:=wobj0; 
-ELSE
-Homing;
-ENDIF
- 
- 
-ENDPROC
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-!#################################################################################  
-    !!! PROCEDURE FOR PICK & PLACE OF PALLET !!!    
-    PROC PlacePallet()
-	! Workobject_2.oframe.trans.z:=Z2offset;
-        SetDO Placed_Pallet,0;
-        WaitTime 0.5; 
-       ! Homing;
-   MoveJ Offs(Pick_Pallet_Approach,0,0,0),vmax,z10,Tooldata_1\WObj:=wobj0; 
-      MoveJ Pick_Pallet_Approach_2,vmax,z10,Tooldata_1\WObj:=wobj0;   
-      
-      MoveJ Pick_Pallet_Start_2,vmax,z10,Tooldata_1\WObj:=wobj0;  
-     SearchL\SStop, Empty,\Flanks,Pick_Pallet_Start,Pick_Pallet_Finish,v100,Tooldata_1\WObj:=wobj0;
-     WaitTime 0.5; 
-      AttachPallet;
-       WaitTime 0.3; 
-      MoveL Pick_Pallet_Start_2,v1000,z10,Tooldata_1\WObj:=wobj0;  
-      MoveJ Pick_Pallet_Approach_2,v1000,z10,Tooldata_1\WObj:=wobj0; 
-        MoveL Pick_Pallet_Approach,v1000,z10,Tooldata_1\WObj:=wobj0; 
-        
-          !MoveJ Offs(Cartons_Placer,0,0,300),v1000,fine,Tooldata_1\WObj:=wobj0; 
-      MoveJ Pallet_Placer_2_2,v1000,fine,Tooldata_1\WObj:=wobj0; 
-            MoveJ Pallet_Placer_2,v1000,fine,Tooldata_1\WObj:=wobj0; 
-      WaitTime 0.5; 
-          DettachPallet;
-          SetDO Attach3,0;
-          SetDO Placed_Pallet,1;
-      WaitTime 0.5;     
-        SetDO Placed_Pallet,1;
-         MoveJ Offs(Pallet_Placer_2_2,0,0,100),vmax,fine,Tooldata_1\WObj:=wobj0; 
-        ERROR
-       IF ERRNO = ERR_WHLSEARCH THEN
-           Set Sequence_Fault;
-       StorePath; 
-        SetDO Load_Pallets,0;
-      MoveL Pick_Pallet_Start,vmax,fine,Tooldata_1\WObj:=wobj0;
-      ! NEED TO CHANGE SIGNAL TO PALLETS LOADED DI!!
-      WaitDI Cartons_Loaded,1;
-      Reset Sequence_Fault;
-      TPWrite "Insert Empty";
-      RestoPath;
-      ClearPath;
-      StartMove;    
-      RETRY;
-    ENDIF
-    ENDPROC
-!#################################################################################    
-  
-!#################################################################################    
-!PROCEDURE TO SET INITIAL SPEED FROM HMI
-PROC SetSpeed()
-    
-      ! HMI Use
-      vel_operation:=Vel_Percentage;
-      
-!!       PC Interface Use
-!      vel_operation:=VelocityPercentage;
-      
-      WHILE vel_operation=0 DO
-        TPErase;
-        TPWrite " Speed setted from PLC is zero";
-        TPWrite " Waiting for value greater than zero";
-        
-!        ! PC Interface Use
-!        WaitUntil VelocityPercentage>0;
-!        WaitTime 1;
-        
-        ! HMI Use
-        vel_operation:=Vel_Percentage;
-        
-!        ! PC Interface Use
-!        vel_operation:=VelocityPercentage;
-        
-        TPErase;
-      ENDWHILE
-    IF vel_operation>100 vel_operation:=100;
-    IF vel_operation<20 vel_operation:=20;
-    VelSet vel_operation,7000;
-  ENDPROC   
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-!#################################################################################    NEEDS FURTHER WORK FOR DETERMINING REACHABILITY #################
-   PROC CheckReachable (robtarget robtarget_reach, PERS tooldata Tooldata_1)!,\PERS wobjdata Workobject_2)
-
-    VAR jointtarget jntReach; 
-    bReachable:=1;
-    !IF present (Workobject_2) THEN 
-       ! jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_2);
-   ! ELSE
-        jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_2);
-   ! ENDIF
-    ERROR
-      IF ERRNO=ERR_ROBLIMIT  THEN 
-          bReachable:=2;
-          TPWrite "Not Reachable";
-          Homing;
-          !TPWrite "Not Reachable";
-          StopMove;
-          TRYNEXT;
-      ENDIF
-          IF ERRNO=ERR_OUTSIDE_REACH  THEN 
-          bReachable:=2;
-          TPWrite "Not Reachable";
-          Homing;
-          !TPWrite "Not Reachable";
-          StopMove;
-          TRYNEXT;
-      ENDIF
-   ENDPROC
-!#################################################################################   
-
-
-
-!#################################################################################    NEEDS FURTHER WORK FOR DETERMINING REACHABILITY #################
-   PROC CheckReachable1 (robtarget robtarget_reach, PERS tooldata Tooldata_1,\PERS wobjdata Workoject_1)
-
-    VAR jointtarget jntReach; 
-    bReachable:=1;
-    IF present (Workobject_1) THEN 
-        jntReach:=CalcJointT(robtarget_reach,Tooldata_1\WObj:=Workobject_1);
-    ELSE
-        jntReach:=CalcJointT(robtarget_reach,Tooldata_1);
-    ENDIF
-    ERROR
-      IF ERRNO=ERR_ROBLIMIT  THEN 
-          bReachable:=2;
-          TPWrite "Not Reachable";
-          Homing;
-          !TPWrite "Not Reachable";
-          StopMove;
-          TRYNEXT;
-      ENDIF
-          IF ERRNO=ERR_OUTSIDE_REACH  THEN 
-          bReachable:=2;
-          TPWrite "Not Reachable";
-          Homing;
-         ! TPWrite "Not Reachable";
-          StopMove;
-          TRYNEXT;
-      ENDIF
-   ENDPROC
-!#################################################################################   
-    
-    
-    TRAP Traproutine
-     StopMove;
-     WaitUntil Continue=1 OR Restart =1 OR EndCycle=1;
-     Current_Position:=CPos(\Tool:=tool0 \WObj:=wobj0);
-     IF Continue=1 THEN
-        StorePath;
-         WaitDI Interrupt,0;
-           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0); 
-            RestoPath;
-         StartMove;
-     ENDIF
-     IF Restart=1 THEN
-         ClearPath;
-           WaitDI Interrupt,0;
-         IDelete ErrorInt;
-         StartMove;
-         ExitCycle;
-     ENDIF
-     IF EndCycle=1 THEN
-         Homing;
-          StopMove;
-          StorePath;
-            MoveJ Home_1,v3000,fine,Tooldata_1\WObj:=wobj0;
-           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0);
-         WaitDI Interrupt,0;
-         ClearPath;
-         TPWrite "Stop at end of Cycle";
-         bProgEND:=TRUE;
-!          ExitCycle;
-     ENDIF
-       ERROR
-         IF ERRNO = ERR_WHLSEARCH THEN
-       StorePath; 
-     SetDO Load_Cartons,0;
-      MoveJ Cartons_Start_2,vmax,z100,tool0\WObj:=wobj0;
-      WaitDI Cartons_Loaded,1;
-      TPWrite "Insert";
-      SetDO Load_Cartons,1;
-      RestoPath;
-      ClearPath;
-      StartMove;
-      RETRY;
-         endif
- ENDTRAP  
-  
- 
-     !! Traproutine connected to collision error
-     TRAP Traproutine2
-        !Reset Homing_button;
-!        StopMove;
-!        StorePath;
-!         WaitDI Homing_Button,0;
-!           p10:=CRobT(\Tool:=tool0 \Wobj:=wobj0); 
-!            RestoPath;
-!         StartMove;
-         Current_Position:=CPos(\Tool:=Tooldata_1 \WObj:=wobj0);
-          WaitDI Homing_Button,0;
-            TPWrite "Press Start to GO TO HOME";
-            WaitTime 2;
-        !  WaitDI Start_Home_DI,1;
-             Homing;
-             StopMove;
-            StorePath;
-          !Homing;
-         ! WaitTime 2;
-       !   StopMove;
-      ! RestoPath;
-        !  StartMove;
-           !MoveJ Home_1,v3000,fine,Tooldata_1\WObj:=wobj0;
-         ClearPath;
-         ExitCycle;
-         ReSet Start_Home_DO;  
-    ENDTRAP
- 
-TRAP Traproutine3
-VAR num speed_corr;
-WaitDI Velocity_Control,0;
-
-!Include a velocity Set DI  with DO crossconnection
-
-!HMI Use
-vel_operation := Vel_Percentage;
-
-!!PC Interface Use
-!vel_operation:= VelocityPercentage;
-
-VelSet vel_operation,7000;
-ERROR
-IF ERRNO = ERR_SPEED_REFRESH_LIM THEN
-IF vel_operation > 100 THEN 
-    vel_operation := 100;
-ENDIF
-IF vel_operation < 0 THEN
-vel_operation := 0;
-ENDIF
-RETURN;
-ENDIF
-ENDTRAP
-    PROC All_paths()
-        MoveL Home_1,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_2_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Place_1_Syn_10,v1000,z100,Tooldata_1\WObj:=Workobject_1;
-        MoveL Place_1_Syn_10,v1000,z100,Tooldata_1\WObj:=Workobject_1;
-        MoveL Pick_1_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_2_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveJ Place_1_Syn_10_3,v1000,z100,Tooldata_1\WObj:=Workobject_2;
-        MoveL Cartons_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Cartons_Placer,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Cartons_Start,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Cartons_Start_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Cartons_Approach_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Cartons_End,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_1_Approach_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pallet_Placer_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pallet_Placer_2_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_Pallet_Finish,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_Pallet_Start,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_Pallet_Start_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_Pallet_Approach_2,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Pick_Pallet_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Homing_Right_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-        MoveL Homing_Left_Approach,v1000,z100,Tooldata_1\WObj:=wobj0;
-    ENDPROC
-
-
- 
-!    !! Traproutine connected to collision error
-!     TRAP Traproutine1
-!         Reset Trigger;
-        
-!        StopMove;
-!        WaitUntil Trigger=0;
-!         WaitUntil Continue=1 OR Restart1=1;
-!        IF Continue=1 THEN
-!        MotionSup\Off;
-!        StartMove;
-!         MotionSup\On;
-!        SetDO Continue,0;
-!         ELSEIF Restart1=1 THEN
-!         ClearPath;
-!         SetDO Restart1,0;
-!         IDelete Safety;
-!         MotionSup\Off;
-!         StartMove;
-!         Homing;
-!         MotionSup\On;
-!         ExitCycle;
-!       ENDIF
-!    ENDTRAP
- 
- 
 ENDMODULE
