@@ -94,11 +94,7 @@ namespace Robot_PC_Interface_Panel_Template_New
                         digitalSig2 = (DigitalSignal)sig2; int val3 = digitalSig2.Get();
                     {
                         digitalSig2.Pulse();
-
-
                     }
-
-
                 }
             }
         }
@@ -112,16 +108,11 @@ namespace Robot_PC_Interface_Panel_Template_New
                 {
                     tasks = controller1.Rapid.GetTasks();
                     using (Mastership m = Mastership.Request(controller1.Rapid))
-
                     {
                         //Perform Operation
                         this.controller1.Rapid.Start(true);
-                        this.controller1.Rapid.UIInstruction.UIInstructionEvent += new UIInstructionEventHandler(OnUIInstructionEvent);
-                        //m.Dispose();
-
+                        this.controller1.Rapid.UIInstruction.UIInstructionEvent += new UIInstructionEventHandler(OnUIInstructionEvent)
                     }
-
-                    //  using (Mastership m = Mastership.Release(controller.Rapid)
                 }
                 else
                 {
@@ -136,7 +127,6 @@ namespace Robot_PC_Interface_Panel_Template_New
             {
                 MessageBox.Show("Unexpected error occurred: " + ex.Message);
             }
-
         }
 
         private void Button11_Click(object sender, EventArgs e)
@@ -155,11 +145,7 @@ namespace Robot_PC_Interface_Panel_Template_New
                         digitalSig4 = (DigitalSignal)sig4; int val = digitalSig4.Get();
                     {
                         digitalSig4.Pulse();
-                        //digitalSig3.Set();
-                        //   m.Dispose();
-
                     }
-                    //  this.controller.Dispose();
                 }
             }
         }
@@ -177,11 +163,8 @@ namespace Robot_PC_Interface_Panel_Template_New
                         //Perform Operation
                         this.controller1.Rapid.Start(true);
                         this.controller1.Rapid.UIInstruction.UIInstructionEvent += new UIInstructionEventHandler(OnUIInstructionEvent);
-                        //m.Dispose();
 
                     }
-
-                    //  using (Mastership m = Mastership.Release(controller.Rapid)
                 }
                 else
                 {
@@ -210,33 +193,14 @@ namespace Robot_PC_Interface_Panel_Template_New
 
 
                 }
-
-
-
-
-
                 Signal sig1 = this.controller1.IOSystem.GetSignal("Start_Program_DO");
                 DigitalSignal
                     digitalSig1 = (DigitalSignal)sig1; int val1 = digitalSig1.Get();
                 {
-
                     digitalSig1.Set();
                     Thread.Sleep(2);
-
                 }
-
-            }
-
-
-
-
-           
-
-          
-            // if (controller.OperatingMode == ControllerOperatingMode.Auto)
-            //  {
-            //   using (Mastership m = Mastership.Request(controller.Rapid))
-            //  {    
+            }   
 
         }
 
@@ -251,11 +215,8 @@ namespace Robot_PC_Interface_Panel_Template_New
                         digitalSig3 = (DigitalSignal)sig3; int val = digitalSig3.Get();
                     {
                         digitalSig3.Pulse();
-                        //digitalSig3.Set();
-                        //   m.Dispose();
 
                     }
-                    //  this.controller.Dispose();
                 }
             }
         }

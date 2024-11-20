@@ -1,0 +1,14 @@
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.csprojAssemblyReference.cache
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.Properties.Resources.resources
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.csproj.GenerateResource.cache
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.csproj.CoreCompileInputs.cache
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\SocketClientApp.exe.config
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\SocketClientApp.exe
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\SocketClientApp.pdb
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\ABB.Robotics.Controllers.PC.dll
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\RobotStudio.Services.RobApi.Desktop.dll
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\RobotStudio.Services.RobApi.dll
+C:\Users\alexandrosm\source\repos\SocketClientApp\bin\Debug\ABB.Robotics.Controllers.PC.xml
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.csproj.CopyComplete
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.exe
+C:\Users\alexandrosm\source\repos\SocketClientApp\obj\Debug\SocketClientApp.pdb
