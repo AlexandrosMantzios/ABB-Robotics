@@ -38,10 +38,6 @@ namespace Robot_PC_Interface_Panel_Template_New
         internal static Form5 form5;
 
 
-        // private ABB.Robotics.Controllers.RapidDomain.Num NumberOfPallets;
-        //  private RapidData NumberOfPallets1;
-        // readonly double NumOfPalletschanged;
-
 
         public Form1()
         {   // Initialize screen 
@@ -51,11 +47,9 @@ namespace Robot_PC_Interface_Panel_Template_New
         }
 
     
-
-
         public NetworkScanner scanner { get; private set; }
 
-        // LOAD FORM
+        // LOAD FORM TO FIND CONTROLLER
 
         public void Form1_Load(object sender, EventArgs e)
         {
@@ -170,15 +164,11 @@ namespace Robot_PC_Interface_Panel_Template_New
 
             }
 
-          
-
             {
                 Signal sig7 = controller.IOSystem.GetSignal("PalletSensor");
                 DigitalSignal digitalSig = (DigitalSignal)sig7; int val1 = digitalSig.Get();
                 sig7.Changed += new EventHandler<SignalChangedEventArgs>(sig7_Changed);
             }
-
-
 
             {
 
@@ -187,13 +177,11 @@ namespace Robot_PC_Interface_Panel_Template_New
                 sig8.Changed += new EventHandler<SignalChangedEventArgs>(sig8_Changed);
             }
 
-
             {
                 Signal sig9 = controller.IOSystem.GetSignal("PLC_Comms");
                 DigitalSignal digitalSig = (DigitalSignal)sig9; int val3 = digitalSig.Get();
                 sig9.Changed += new EventHandler<SignalChangedEventArgs>(sig9_Changed);
             }
-
 
             {
                 Signal sig10 = controller.IOSystem.GetSignal("ProductinPlace");
@@ -212,8 +200,6 @@ namespace Robot_PC_Interface_Panel_Template_New
                 Signal sig12 = controller.IOSystem.GetSignal("Motors_ON");
                 DigitalSignal digitalSig = (DigitalSignal)sig12; int val6 = digitalSig.Get();
                 sig12.Changed += new EventHandler<SignalChangedEventArgs>(sig12_Changed);
- 
-
             }
 
 
@@ -273,9 +259,7 @@ namespace Robot_PC_Interface_Panel_Template_New
         public void UpdateUI2(object sender, SignalChangedEventArgs e)
         {
             SignalState sig9 = e.NewSignalState;
-            float val3 = sig9.Value;
-            
-            
+            float val3 = sig9.Value;   
         }
 
 
@@ -283,7 +267,6 @@ namespace Robot_PC_Interface_Panel_Template_New
         {
             SignalState sig10 = e.NewSignalState;
             float val4 = sig10.Value;
-
         }
 
 
@@ -299,14 +282,9 @@ namespace Robot_PC_Interface_Panel_Template_New
             float val6 = sig12.Value;
         }
 
-
-        
-
-
         public void UpdateListValueControllers(object sender, SignalChangedEventArgs e)
         {
             ListViewItem item1 = null;
-
             IOFilterTypes aSigFilter = IOFilterTypes.Digital | IOFilterTypes.Input;
             SignalCollection signals = this.controller.IOSystem.GetSignals(aSigFilter);
 
@@ -321,9 +299,7 @@ namespace Robot_PC_Interface_Panel_Template_New
                  //   this.listView2.Items.Add(item1);
                     item1.Tag = Signal1;
                 }
-
             }
-
 
         }
 
@@ -592,13 +568,10 @@ namespace Robot_PC_Interface_Panel_Template_New
                     ChangedValue1.Value = 1;
                     {
                         product.Value = ChangedValue1;
-                     //   m.Dispose();
+
                     }
-                    // ABB.Robotics.Controllers.RapidDomain.String rapidString;
-                    // rapidString.FillFromString(textBox1.Text);       
-                    // rd.Value = rapidString;
+
                 }
-               // this.controller.Dispose();
             }
         }
 
@@ -614,26 +587,12 @@ namespace Robot_PC_Interface_Panel_Template_New
                     ChangedValue2.Value = 2;
                     {
                         product.Value = ChangedValue2;
-                      //  m.Dispose();
 
                     }
-                  //  this.controller.Dispose();
-                    // ABB.Robotics.Controllers.RapidDomain.String rapidString;
-                    // rapidString.FillFromString(textBox1.Text);       
-                    // rd.Value = rapidString;
+
                 }
             }
         }
-
-
-
-
-       
-
-
-
-
-        
 
 
 
@@ -714,10 +673,7 @@ namespace Robot_PC_Interface_Panel_Template_New
             {
                 digitalSig3.Reset();
             }
-            // if (controller.OperatingMode == ControllerOperatingMode.Auto)
-            //  {
-            //   using (Mastership m = Mastership.Request(controller.Rapid))
-            //  {          
+            // if (controller.OperatingMode == ControllerOperatingMode.Auto)          
         }
 
 
@@ -735,12 +691,6 @@ namespace Robot_PC_Interface_Panel_Template_New
         {
             Form3 f1 = new Form3();
             f1.Show();
-            //Hide other user controls;
-            //  userControl11.Hide();
-            // userControl21.Hide();
-            //Show current user control
-            // userControl31.Show();
-
         }
 
         public void Button15_Click(object sender, EventArgs e)
@@ -748,11 +698,6 @@ namespace Robot_PC_Interface_Panel_Template_New
             {
                 Form4 f2 = new Form4();
                 f2.Show();
-                //Hide other user controls;
-                //  userControl11.Hide();
-                // userControl31.Hide();
-                //Show current user control
-                // userControl21.Show();
 
             }
         }
